@@ -8,6 +8,7 @@ public class MainApp {
     private static final FileManager fileManager = new FileManager();
     private static final Validator validator = new Validator();
     private static final BruteForce bruteForce = new BruteForce(cipher);
+    private static final StatisticalAnalyzer statisticalAnalyzer = new StatisticalAnalyzer(cipher);
 
     public static void main(String[] args) {
         boolean программаРаботает = true;
@@ -28,7 +29,7 @@ public class MainApp {
                     bruteForceFile();
                     break;
                 case "4":
-                    System.out.println("Статистический анализ будет добавлен позже.");
+                    statisticalAnalysisFile();
                     break;
                 case "0":
                     программаРаботает = false;
@@ -132,6 +133,41 @@ public class MainApp {
             System.out.println("Ошибка при работе с файлом: " + ошибка.getMessage());
         }
     }
+
+    private static void statisticalAnalysisFile() {
+    try {
+        System.out.print("Введите путь к зашифрованному файлу: ");
+        String входнойФайл = scanner.nextLine();
+
+        System.out.print("Введите путь к файлу для результата статистического анализа: ");
+        String выходнойФайл = scanner.nextLine();
+
+        validator.validateInputFile(входнойФайл);
+        validator.validateOutputFile(выходнойФайл);
+
+        String зашифрованныйТекст = fileManager.readFile(входнойФайл);
+
+        StatisticalAnalyzer.AnalysisResult результатАнализа =
+                statisticalAnalyzer.analyze(зашифрованныйТекст);
+
+        String текстДляЗаписи =
+                "Статистический анализ завершён." + System.lineSeparator() +
+                "Наиболее вероятный ключ: " + результатАнализа.getКлюч() + System.lineSeparator() +
+                "Оценка текста: " + результатАнализа.getБалл() + System.lineSeparator() +
+                "========================================" + System.lineSeparator() +
+                результатАнализа.getРасшифрованныйТекст();
+
+        fileManager.writeFile(выходнойФайл, текстДляЗаписи);
+
+        System.out.println("Статистический анализ выполнен.");
+        System.out.println("Наиболее вероятный ключ: " + результатАнализа.getКлюч());
+        System.out.println("Результат сохранён в файл: " + выходнойФайл);
+    } catch (IllegalArgumentException ошибка) {
+        System.out.println("Ошибка валидации: " + ошибка.getMessage());
+    } catch (IOException ошибка) {
+        System.out.println("Ошибка при работе с файлом: " + ошибка.getMessage());
+    }
+}
 
     private static int readKey() {
         System.out.print("Введите ключ шифрования: ");
