@@ -7,6 +7,7 @@ public class MainApp {
     private static final Cipher cipher = new Cipher();
     private static final FileManager fileManager = new FileManager();
     private static final Validator validator = new Validator();
+    private static final BruteForce bruteForce = new BruteForce(cipher);
 
     public static void main(String[] args) {
         boolean программаРаботает = true;
@@ -24,7 +25,7 @@ public class MainApp {
                     decryptFile();
                     break;
                 case "3":
-                    System.out.println("Режим brute force будет добавлен на следующем этапе.");
+                    bruteForceFile();
                     break;
                 case "4":
                     System.out.println("Статистический анализ будет добавлен позже.");
@@ -100,6 +101,31 @@ public class MainApp {
 
             System.out.println("Файл успешно расшифрован.");
             System.out.println("Результат сохранён в файл: " + выходнойФайл);
+        } catch (IllegalArgumentException ошибка) {
+            System.out.println("Ошибка валидации: " + ошибка.getMessage());
+        } catch (IOException ошибка) {
+            System.out.println("Ошибка при работе с файлом: " + ошибка.getMessage());
+        }
+    }
+
+    private static void bruteForceFile() {
+        try {
+            System.out.print("Введите путь к зашифрованному файлу: ");
+            String входнойФайл = scanner.nextLine();
+
+            System.out.print("Введите путь к файлу для всех вариантов расшифровки: ");
+            String выходнойФайл = scanner.nextLine();
+
+            validator.validateInputFile(входнойФайл);
+            validator.validateOutputFile(выходнойФайл);
+
+            String зашифрованныйТекст = fileManager.readFile(входнойФайл);
+            String всеВарианты = bruteForce.decryptAllVariants(зашифрованныйТекст);
+
+            fileManager.writeFile(выходнойФайл, всеВарианты);
+
+            System.out.println("Brute force выполнен.");
+            System.out.println("Все варианты сохранены в файл: " + выходнойФайл);
         } catch (IllegalArgumentException ошибка) {
             System.out.println("Ошибка валидации: " + ошибка.getMessage());
         } catch (IOException ошибка) {
