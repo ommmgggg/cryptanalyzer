@@ -27,3 +27,9 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+*.class
+out/
+target/
+.idea/
+.vscode/
